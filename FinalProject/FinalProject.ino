@@ -17,7 +17,7 @@ int greenPin = 5;
  */
 int ballX;
 int ballY;
-int ballYDirection = 1;
+int ballYDirection = -1;
 int ballXDirection = 1;
 int aiX = 0;
 int aiY = 7;
@@ -27,6 +27,7 @@ int playerY = 0;
 const short WAIT = 4;
 const short LOOP_CHECK = 9;
 long loops = 0;
+bool gameOver = false;
 
 
 
@@ -39,7 +40,7 @@ void setup() {
   pinMode(greenPin, INPUT);
   randomSeed(analogRead(0));
   ballX = random(3, 5);
-  ballY = random(3, 5);
+  ballY = random(3, 6);
   #ifdef DEBUG
   Serial.begin(9600);
   #endif
@@ -146,7 +147,7 @@ void updateGame()
                 #ifdef DEBUG
                 Serial.print("Player Lost!\n");
                 #endif
-                asm volatile ("jmp 0");  
+                gameOver= true;
               }
            }
            else if (ballY == aiY)
@@ -171,7 +172,7 @@ void updateGame()
                 #ifdef DEBUG
                 Serial.print("AI Lost!\n");
                 #endif
-                asm volatile ("jmp 0");  
+                gameOver= true;  
               }
            }
            
@@ -192,9 +193,14 @@ void updateGame()
 
 void loop() {
   loops++;
-  
+
   drawBall();
   drawPaddles();
+  if (gameOver)
+  {
+    delay(2000);
+    asm volatile ("jmp 0");
+  }
   if (loops > 100) //temporary measure to only start the game after 100 loops
   {
     updateGame();

@@ -18,7 +18,7 @@ int greenPin = 5;
 int ballX;
 int ballY;
 int ballYDirection = 1;
-int ballXDirection = -1;
+int ballXDirection = 1;
 int aiX = 0;
 int aiY = 7;
 int playerX = 6;
@@ -39,7 +39,7 @@ void setup() {
   pinMode(greenPin, INPUT);
   randomSeed(analogRead(0));
   ballX = random(3, 5);
-  ballY = random(2, 6);
+  ballY = random(3, 5);
   #ifdef DEBUG
   Serial.begin(9600);
   #endif
@@ -107,6 +107,12 @@ void drawPaddles()
 
 void updateGame()
 {
+    #ifdef DEBUG
+    Serial.print(ballX);
+    Serial.print(ballY);
+    Serial.print("\n\n");
+    #endif
+    
     if (loops % LOOP_CHECK == 0)
     {
        ballX += ballXDirection;
@@ -120,9 +126,17 @@ void updateGame()
        {
            if (ballY == playerY)
            {
-              if (playerX == ballX or playerX + 1 == ballX)
+              if (playerX == ballX)
               {
                 ballYDirection *= -1;
+                ballXDirection = -1;
+                #ifdef DEBUG
+                Serial.print("Player Bounce!\n");
+                #endif
+              }
+              else if (playerX + 1 == ballX){
+                ballYDirection *= -1;
+                ballXDirection = 1;
                 #ifdef DEBUG
                 Serial.print("Player Bounce!\n");
                 #endif
@@ -137,9 +151,17 @@ void updateGame()
            }
            else if (ballY == aiY)
            {
-              if (aiX == ballX or aiX + 1 == ballX)
+              if (aiX == ballX)
               {
                 ballYDirection *= -1;
+                ballXDirection = 1;
+                #ifdef DEBUG
+                Serial.print("AI Bounce!\n");
+                #endif
+              }
+              else if (aiX + 1 == ballX){
+                ballYDirection *= -1;
+                ballXDirection = -1;
                 #ifdef DEBUG
                 Serial.print("AI Bounce!\n");
                 #endif
@@ -173,7 +195,7 @@ void loop() {
   
   drawBall();
   drawPaddles();
-  if (loops > 200) //temporary measure to only start the game after 200 loops
+  if (loops > 100) //temporary measure to only start the game after 100 loops
   {
     updateGame();
   }

@@ -19,9 +19,9 @@ int ballX;
 int ballY;
 int ballYDirection = -1;
 int ballXDirection = 1;
-int aiX = 0;
+int aiX = 3;
 int aiY = 7;
-int playerX = 6;
+int playerX = 3;
 int playerY = 0;
 
 const short WAIT = 4;
@@ -108,11 +108,11 @@ void drawPaddles()
 
 void moveAI()
 {
-  if (ballX > aiX)
+  if (ballX > aiX - 2)
   {
     aiX++;
   }
-  else if (ballX < aiX)
+  else if (ballX < aiX + 2)
   {
     aiX--;
   }
@@ -229,7 +229,7 @@ void loop() {
     delay(2000);
     asm volatile ("jmp 0");
   }
-  if (loops > 100) //temporary measure to only start the game after 100 loops
+  if (loops > 200) //temporary measure to only start the game after 200 loops
   {
     updateGame();
   }

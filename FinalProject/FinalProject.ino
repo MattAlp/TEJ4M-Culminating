@@ -39,8 +39,8 @@ void setup() {
   pinMode(redPin, INPUT);
   pinMode(greenPin, INPUT);
   randomSeed(analogRead(0));
-  ballX = random(3, 5);
-  ballY = random(3, 6);
+  ballX = random(2, 6);
+  ballY = random(3, 5);
   #ifdef DEBUG
   Serial.begin(9600);
   #endif
@@ -198,6 +198,20 @@ void loop() {
   drawPaddles();
   if (gameOver)
   {
+    if (ballY == playerY)
+    {
+      digitalWrite(latchPin, LOW);
+      shiftOut(dataPin, clockPin, LSBFIRST, 0b10000000); //col
+      shiftOut(dataPin, clockPin, LSBFIRST, ~0b11111111); //row
+      digitalWrite(latchPin, HIGH);
+    }
+    else if (aiY == playerY)
+    {
+      digitalWrite(latchPin, LOW);
+      shiftOut(dataPin, clockPin, LSBFIRST, 0b00000001); //col
+      shiftOut(dataPin, clockPin, LSBFIRST, ~0b11111111); //row
+      digitalWrite(latchPin, HIGH);
+    }
     delay(2000);
     asm volatile ("jmp 0");
   }

@@ -106,6 +106,18 @@ void drawPaddles()
   delay(WAIT);
 }
 
+void moveAI()
+{
+  if (ballX > aiX)
+  {
+    aiX++;
+  }
+  else if (ballX < aiX)
+  {
+    aiX--;
+  }
+}
+
 void updateGame()
 {
     #ifdef DEBUG
@@ -178,6 +190,8 @@ void updateGame()
            
        }
 
+       moveAI();
+
        if (digitalRead(greenPin) == HIGH)
        {
            playerX--;
@@ -205,7 +219,7 @@ void loop() {
       shiftOut(dataPin, clockPin, LSBFIRST, ~0b11111111); //row
       digitalWrite(latchPin, HIGH);
     }
-    else if (aiY == playerY)
+    else if (ballY == aiY)
     {
       digitalWrite(latchPin, LOW);
       shiftOut(dataPin, clockPin, LSBFIRST, 0b00000001); //col

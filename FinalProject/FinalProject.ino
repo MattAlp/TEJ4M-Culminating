@@ -15,17 +15,17 @@ int greenPin = 5;
 /*
  * X is columns, Y is rows, and everything is flipped
  */
-int ballX = 2;
-int ballY = 2;
+int ballX;
+int ballY;
 int ballYDirection = 1;
-int ballXDirection = 1;
-int aiX = 3;
+int ballXDirection = -1;
+int aiX = 0;
 int aiY = 7;
-int playerX = 3;
+int playerX = 6;
 int playerY = 0;
 
-const short WAIT = 5;
-const short LOOP_CHECK = 7;
+const short WAIT = 4;
+const short LOOP_CHECK = 9;
 long loops = 0;
 
 
@@ -37,6 +37,9 @@ void setup() {
   pinMode(dataPin, OUTPUT);
   pinMode(redPin, INPUT);
   pinMode(greenPin, INPUT);
+  randomSeed(analogRead(0));
+  ballX = random(3, 5);
+  ballY = random(2, 6);
   #ifdef DEBUG
   Serial.begin(9600);
   #endif
@@ -57,7 +60,7 @@ void drawBall()
   {
     digitalWrite(latchPin, LOW);
     shiftOut(dataPin, clockPin, LSBFIRST, 0b00000001 << ballY); //col
-    shiftOut(dataPin, clockPin, LSBFIRST, ~(0b00000001 << ballX)); //row
+    shiftOut(dataPin, clockPin, LSBFIRST, ~(0b10000000 >> ballX)); //row
     digitalWrite(latchPin, HIGH);
     delay(WAIT);
   }
@@ -72,7 +75,7 @@ void drawPaddles()
   if (ballY == 0)
   {
       shiftOut(dataPin, clockPin, LSBFIRST, 0b00000001 << playerY); //col
-      shiftOut(dataPin, clockPin, LSBFIRST, ~((0b11000000 >> playerX) | 1UL << ballX)); //row, https://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit, toggle bit
+      shiftOut(dataPin, clockPin, LSBFIRST, ~((0b11000000 >> playerX) | 0b10000000 >> ballX)); //row, https://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit, toggle bit
   }
   else
   {
@@ -90,7 +93,7 @@ void drawPaddles()
   if (ballY == 7)
   {
       shiftOut(dataPin, clockPin, LSBFIRST, 0b00000001 << aiY); //col
-      shiftOut(dataPin, clockPin, LSBFIRST, ~((0b11000000 >> aiX) | 1UL << ballX)); //row, https://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit, toggle bit
+      shiftOut(dataPin, clockPin, LSBFIRST, ~((0b11000000 >> aiX) | 0b10000000 >> ballX)); //row, https://stackoverflow.com/questions/47981/how-do-you-set-clear-and-toggle-a-single-bit, toggle bit
   }
   else
   {
@@ -104,7 +107,6 @@ void drawPaddles()
 
 void updateGame()
 {
-    loops++;
     if (loops % LOOP_CHECK == 0)
     {
        ballX += ballXDirection;
@@ -116,48 +118,40 @@ void updateGame()
        
        if (ballY == playerY || ballY == aiY)
        {
-          if (ballY == playerY)
-          {
-            #ifdef DEBUG
-          Serial.print(playerX);
-          Serial.print(", ");
-          Serial.print(playerX + 1);
-          Serial.print(": ");
-          Serial.print(ballX);
-          Serial.print("\n\n");
-          #endif
-          }
-          
-
-          ballYDirection *= -1;
-//           if (ballY == playerY)
-//           {
-//              if (playerX + 1 == ballX or playerX + 2 == ballX)
-//              {
-//                ballYDirection *= -1;
-//                #ifdef DEBUG
-//                Serial.print("Player Bounce!\n");
-//                #endif
-//              }
-//              else
-//              {
-//                ballYDirection *= -1;
-//              }
-//           }
-//           else if (ballY == aiY)
-//           {
-//              if (aiX + 1 == ballX or aiX + 2 == ballX)
-//              {
-//                ballYDirection *= -1;
-//                #ifdef DEBUG
-//                Serial.print("AI Bounce!\n");
-//                #endif
-//              }
-//              else
-//              {
-//                ballYDirection *= -1;
-//              }
-//           }
+           if (ballY == playerY)
+           {
+              if (playerX == ballX or playerX + 1 == ballX)
+              {
+                ballYDirection *= -1;
+                #ifdef DEBUG
+                Serial.print("Player Bounce!\n");
+                #endif
+              }
+              else
+              {
+                #ifdef DEBUG
+                Serial.print("Player Lost!\n");
+                #endif
+                asm volatile ("jmp 0");  
+              }
+           }
+           else if (ballY == aiY)
+           {
+              if (aiX == ballX or aiX + 1 == ballX)
+              {
+                ballYDirection *= -1;
+                #ifdef DEBUG
+                Serial.print("AI Bounce!\n");
+                #endif
+              }
+              else
+              {
+                #ifdef DEBUG
+                Serial.print("AI Lost!\n");
+                #endif
+                asm volatile ("jmp 0");  
+              }
+           }
            
        }
 
@@ -175,9 +169,15 @@ void updateGame()
 }
 
 void loop() {
-  updateGame();
+  loops++;
+  
   drawBall();
   drawPaddles();
+  if (loops > 200) //temporary measure to only start the game after 200 loops
+  {
+    updateGame();
+  }
+  
 }
 
 

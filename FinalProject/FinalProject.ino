@@ -15,17 +15,17 @@ int greenPin = 5;
 /*
  * X is columns, Y is rows, and everything is flipped
  */
-int ballX;
+int ballX = 3;
 int ballY;
-int ballYDirection = -1;
+int ballYDirection = 1;
 int ballXDirection = 1;
 int aiX = 3;
 int aiY = 7;
 int playerX = 3;
 int playerY = 0;
 
-const short WAIT = 4;
-const short LOOP_CHECK = 9;
+const short WAIT = 6;
+const short LOOP_CHECK = 12;
 long loops = 0;
 bool gameOver = false;
 
@@ -39,7 +39,6 @@ void setup() {
   pinMode(redPin, INPUT);
   pinMode(greenPin, INPUT);
   randomSeed(analogRead(0));
-  ballX = random(2, 6);
   ballY = random(3, 5);
   #ifdef DEBUG
   Serial.begin(9600);
@@ -108,11 +107,11 @@ void drawPaddles()
 
 void moveAI()
 {
-  if (ballX > aiX - 2)
+  if (ballX > aiX - 1)
   {
     aiX++;
   }
-  else if (ballX < aiX + 2)
+  else if (ballX < aiX + 1)
   {
     aiX--;
   }

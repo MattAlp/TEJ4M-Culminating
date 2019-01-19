@@ -1,4 +1,5 @@
 {
     "board": "arduino:avr:uno",
-    "programmer": "AVR ISP"
+    "programmer": "AVR ISP",
+    "sketch": "FinalProject\\FinalProject.ino"
 }

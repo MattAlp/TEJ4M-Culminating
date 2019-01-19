@@ -21,6 +21,8 @@ int latchPin = 8;
 int clockPin = 10;
 ////Pin connected to DS of 74HC595
 int dataPin = 11;
+
+// This variable is dedicated to Mr. Naccarrato
 //unsigned int datablargh = 65535;
 
 int redPin = 4;
